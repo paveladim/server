@@ -3,6 +3,6 @@
 #include "client.h"
 
 int main() {
-	std::cout << "server?" << std::endl;
+	server test;
 	return 0;
 }

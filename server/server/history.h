@@ -10,6 +10,8 @@ class history {
 	unsigned int _queue_depth;
 public:
 	history(const unsigned int& qd = 10);
+	history(const history& h);
+	history& operator=(const history& h);
 	void add_message(const std::string& msg);
 	std::string get_history();
 };

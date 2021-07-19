@@ -1,7 +1,6 @@
 ﻿  client.cpp
-  history.cpp
-  main.cpp
   room.cpp
-  server.cpp
-D:\materials\projects\server\server\server\server.cpp(11,30): error C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
   Создание кода...
+D:\materials\projects\server\server\server\room.cpp(15): warning C4715: room::operator=: значение возвращается не при всех путях выполнения
+D:\materials\projects\server\server\server\client.cpp(25): warning C4715: client::operator=: значение возвращается не при всех путях выполнения
+  server.vcxproj -> D:\materials\projects\server\server\Debug\server.exe

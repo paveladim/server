@@ -8,12 +8,13 @@ class client;
 
 class room
 {
-	std::list<std::shared_ptr<client>> _participants;
+	std::list<std::shared_ptr<client*>> _participants;
 	history _history_of_room;
 public:
 	room() {}
-	room(const unsigned int& qd = 10);
+	room(const unsigned int& qd);
 	room(const room& r);
+	room& operator=(const room& r);
 	void accept_client(client& new_client);
 	void send_to_participants(const std::string& s, const std::string& name);
 	void kick_user_out(const std::string& name);

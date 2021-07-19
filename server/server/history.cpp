@@ -2,6 +2,19 @@
 
 history::history(const unsigned int& qd) : _queue_depth(qd), _current_depth(0) {}
 
+history::history(const history& h) {
+	_messages = h._messages;
+	_current_depth = h._current_depth;
+	_queue_depth = h._queue_depth;
+}
+
+history& history::operator=(const history& h) {
+	if (this == &h) return *this;
+	_messages = h._messages;
+	_current_depth = h._current_depth;
+	_queue_depth = h._queue_depth;
+}
+
 void history::add_message(const std::string& msg) {
 	if (_current_depth == _queue_depth) {
 		_messages.pop();

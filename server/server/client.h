@@ -10,14 +10,16 @@ class client
 {
 	std::string _name;
 	SOCKET _client_socket;
-	std::shared_ptr<room> _current_room;
-	std::shared_ptr<server> _current_server;
+	std::shared_ptr<room*> _current_room;
+	std::shared_ptr<server*> _current_server;
 	bool _is_connected;
 public:
-	client();
-	client(const std::string& name, const SOCKET& sock, const server& s);
+	client() {}
+	client(const std::string& name, const SOCKET& sock, server& s);
 	client(const client& c);
-	void set_room(const room& r);
+	client& operator=(const client& c);
+	void disconnect();
+	void set_room(room& r);
 	void leave_room();
 	const std::string& get_name() const { return _name; }
 	const SOCKET& get_socket() const { return _client_socket; }
