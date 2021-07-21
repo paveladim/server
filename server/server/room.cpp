@@ -12,15 +12,18 @@ room& room::operator=(const room& r) {
 	if (this == &r) return *this;
 	_participants = r._participants;
 	_history_of_room = r._history_of_room;
+	return *this;
 }
 
 void room::accept_client(client& c) {
 	c.set_room(*this);
-	_participants.push_back(std::make_shared<client*>(&c));
+	auto ptr = std::make_shared<client*>(&c);
+	_participants.push_back(ptr);
 }
 
-void room::send_to_participants(const std::string& s, const std::string& name) {
-	std::string message = name + ": " + s;
+void room::send_to_participants(const std::string& msg, const std::string& name) {
+	std::string message = name + ": " + msg;
+	_history_of_room.add_message(message);
 	
 	for (auto& elem : _participants)
 		if ((*elem)->get_name() != name) send_to((*elem)->get_socket(), message);
@@ -29,16 +32,20 @@ void room::send_to_participants(const std::string& s, const std::string& name) {
 void room::kick_user_out(const std::string& name) {
 	auto result = std::find_if(_participants.begin(), _participants.end(), [&name](std::shared_ptr<client*> c) {
 		return (*c)->get_name() == name;
-		});
+	});
 
 	if (result != _participants.end()) {
+		send_to_participants(name + " has left the room.", "Server");
+		send_to((**result)->get_socket(), "Server: You left the room.");
 		_participants.erase(result);
 	}
 }
 
 void room::kick_all_users_out() {
 	for (auto& elem : _participants)
-		(*elem)->leave_room();
+		(*elem)->unset_room();
+
+	_participants.clear();
 }
 
 void room::get_participants(const std::string& name) {

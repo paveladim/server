@@ -19,11 +19,12 @@ public:
 	bool is_name_unique(std::string& clients_name);
 	void register_user(const SOCKET& sock);
 	std::string receive(const SOCKET& sock);
-	void list_of_rooms(const std::string& clients_name);
-	void create_room(const std::string& command, const std::string& clients_name);
-	void enter_room(const std::string& command, const std::string& clients_name);
+	void list_of_rooms(const client& c);
+	void create_room(const std::string& command, const client& c);
+	void enter_room(const std::string& command, client& c);
 	void delete_room(const std::string& command);
-	void leave_server(const std::string& clients_name);
+	void leave_server(client& c);
+	void get_help(const client& c);
 	void send_to(const SOCKET& sock, const std::string& message);
 	~server();
 };

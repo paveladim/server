@@ -8,8 +8,9 @@ server::server() {
 
 	SOCKADDR_IN addr;
 	int addrl = sizeof(addr);
-	// addr.sin_addr.S_un.S_addr = inet_pton(AF_INET, "127.0.0.1", &addr);
-	addr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	IN_ADDR inad;
+	addr.sin_addr.S_un.S_addr = inet_pton(AF_INET, "127.0.0.1", &inad);
+	addr.sin_addr = inad;
 	addr.sin_port = htons(1111);
 	addr.sin_family = AF_INET;
 	_server_socket = socket(AF_INET, SOCK_STREAM, NULL);
@@ -23,8 +24,6 @@ server::server() {
 			std::cout << "Success" << std::endl;
 			send_to(new_con, "Server: Hello!\n");
 			register_user(new_con);
-			std::cout << "Server: Connected " + _clients.back().get_name() + ".\n";
-			_clients.back().handler();
 		}
 	}
 }
@@ -42,6 +41,7 @@ server& server::operator=(const server& s) {
 	_server_socket = s._server_socket;
 	_rooms = s._rooms;
 	_clients = s._clients;
+	return *this;
 }
 
 bool server::is_name_unique(std::string& clients_name) {
@@ -60,9 +60,10 @@ void server::register_user(const SOCKET& sock) {
 		name = receive(sock);
 	}
 
-	client new_client(name, sock, *this);
-	_clients.push_back(new_client);
 	send_to(sock, "Welcome, " + name + "!");
+	send_to(sock, "Server: Press @help to get more information.");
+	std::cout << "Server: Connected " + name + ".\n";
+	_clients.push_back(client(name, sock, *this));
 }
 
 std::string server::receive(const SOCKET& sock) {
@@ -74,10 +75,10 @@ std::string server::receive(const SOCKET& sock) {
 	return std::string(msg);
 }
 
-void server::list_of_rooms(const std::string& clients_name) {
+void server::list_of_rooms(const client& c) {
 	std::string info;
 	if (_rooms.size() == 0) {
-		info = "Server: There's no room.\n";
+		info = "Server: There's no room.";
 	}
 	else {
 		info = "Rooms:\n";
@@ -85,53 +86,77 @@ void server::list_of_rooms(const std::string& clients_name) {
 			info = info + elem.first + "\n";
 	}
 
-	auto result = std::find_if(_clients.begin(), _clients.end(), [&clients_name](client c) {
-		return c.get_name() == clients_name;
-	});
-
-	if (result != _clients.end()) {
-		SOCKET client_socket = result->get_socket();
-		send_to(client_socket, info);
-	}
+	SOCKET client_socket = c.get_socket();
+	send_to(client_socket, info);
 }
 
-void server::create_room(const std::string& command, const std::string& clients_name) {
+void server::create_room(const std::string& command, const client& c) {
 	auto pos = find(command.begin(), command.end(), ' ');
 	std::string name_of_room;
 	if ((pos != command.end()) && (pos + 1 != command.end())) {
 		for (auto it = pos + 1; it < command.end(); ++it) name_of_room.push_back(*it);
-		_rooms[name_of_room] = *(new room(10));
+		
+		if (_rooms.find(name_of_room) == _rooms.end()) {
+			send_to(c.get_socket(), "Server: Room " + name_of_room + " has been created.");
+			room r(10);
+			_rooms[name_of_room] = r;
+		}
+		else send_to(c.get_socket(), "Server: Name is not unique. Try again.");
 	}
 }
 
-void server::enter_room(const std::string& command, const std::string& clients_name) {
+void server::enter_room(const std::string& command, client& c) {
 	auto pos = find(command.begin(), command.end(), ' ');
 	std::string name_of_room;
 	if ((pos != command.end()) && (pos + 1 != command.end())) {
 		for (auto it = pos + 1; it < command.end(); ++it) name_of_room.push_back(*it);
 	}
 
-	auto result = std::find_if(_clients.begin(), _clients.end(), [&clients_name](client c) {
-		return c.get_name() == clients_name;
-	});
-
-	if ((result != _clients.end()) && (_rooms.find(name_of_room) != _rooms.end()))
-		_rooms[name_of_room].accept_client(*result);
+	if (_rooms.find(name_of_room) != _rooms.end()) {
+		_rooms[name_of_room].accept_client(c);
+		send_to(c.get_socket(), "Server: You entered the room " + name_of_room + ".");
+		_rooms[name_of_room].send_to_participants(c.get_name() + " has joined to room.", "Server");
+	}
+	else send_to(c.get_socket(), "Server: Room does not exist.");
 }
 
 void server::delete_room(const std::string& command) {
+	auto pos = find(command.begin(), command.end(), ' ');
+	std::string name_of_room;
+	if ((pos != command.end()) && (pos + 1 != command.end())) {
+		for (auto it = pos + 1; it < command.end(); ++it) name_of_room.push_back(*it);
+	}
 
+	std::string message = "Room " + name_of_room + " has been closed.";
+	_rooms[name_of_room].send_to_participants(message, "Server");
+	_rooms[name_of_room].kick_all_users_out();
+	_rooms.erase(name_of_room);
 }
 
-void server::leave_server(const std::string& clients_name) {
-	auto result = std::find_if(_clients.begin(), _clients.end(), [&clients_name](client c) {
-		return c.get_name() == clients_name;
-	});
+void server::leave_server(client& c) {
+	c.leave_room();
+	c.disconnect();
 
-	if (result != _clients.end()) {
-		result->leave_room();
-		result->disconnect();
-	}
+	send_to(c.get_socket(), "@ack");
+	
+	auto position = std::find_if(_clients.begin(), _clients.end(), [&c](client cur) {
+		return c.get_name() == cur.get_name();
+	});
+	_clients.erase(position);
+}
+
+void server::get_help(const client& c) {
+	std::string info = "\tHelp:\n";
+	info += "@rooms 				- get information about rooms on server\n";
+	info += "@createroom <name>		- create room\n";
+	info += "@enterroom <name>		- enter the room with the chosen name\n";
+	info += "@participants			- request a list of participants in room\n";
+	info += "@leaveroom 			- leave the room where you at\n";
+	info += "@deleteroom <name>		- delete the room with the chosen name\n";
+	info += "@help					- get help\n";
+	info += "@quit					- end session";
+
+	send_to(c.get_socket(), info);
 }
 
 void server::send_to(const SOCKET& sock, const std::string& message) {
@@ -141,6 +166,11 @@ void server::send_to(const SOCKET& sock, const std::string& message) {
 }
 
 server::~server() {
+	for (auto& elem : _clients)
+		elem.leave_room();
+
+	_clients.clear();
+	_rooms.clear();
 	closesocket(_server_socket);
 	WSACleanup();
 }

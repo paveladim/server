@@ -13,6 +13,7 @@ history& history::operator=(const history& h) {
 	_messages = h._messages;
 	_current_depth = h._current_depth;
 	_queue_depth = h._queue_depth;
+	return *this;
 }
 
 void history::add_message(const std::string& msg) {

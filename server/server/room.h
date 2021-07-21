@@ -16,7 +16,7 @@ public:
 	room(const room& r);
 	room& operator=(const room& r);
 	void accept_client(client& new_client);
-	void send_to_participants(const std::string& s, const std::string& name);
+	void send_to_participants(const std::string& msg, const std::string& name);
 	void kick_user_out(const std::string& name);
 	void kick_all_users_out();
 	void get_participants(const std::string& name);

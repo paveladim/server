@@ -1,6 +1,6 @@
 ﻿  client.cpp
-  room.cpp
+D:\materials\projects\server\server\server\client.cpp(79,31): warning C4390: ";": обнаружен пустой контролируемый оператор; это правильно?
+  main.cpp
+  server.cpp
   Создание кода...
-D:\materials\projects\server\server\server\room.cpp(15): warning C4715: room::operator=: значение возвращается не при всех путях выполнения
-D:\materials\projects\server\server\server\client.cpp(25): warning C4715: client::operator=: значение возвращается не при всех путях выполнения
   server.vcxproj -> D:\materials\projects\server\server\Debug\server.exe

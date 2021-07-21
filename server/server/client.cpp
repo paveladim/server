@@ -4,7 +4,8 @@
 
 client::client(const std::string& name, const SOCKET& sock, server& s) : _name(name),
 	_client_socket(sock), _current_room(nullptr), _is_connected(true),
-	_current_server(std::make_shared<server*>(&s)) {
+	_current_server(std::make_shared<server*>(&s)), _proc_handler(&client::handler, *this) {
+	_proc_handler.detach();
 }
 
 client::client(const client& c) {
@@ -22,9 +23,11 @@ client& client::operator=(const client& c) {
 	_current_room = c._current_room;
 	_current_server = c._current_server;
 	_is_connected = c._is_connected;
+	return *this;
 }
 
 void client::disconnect() {
+	_current_server = nullptr;
 	_is_connected = false;
 }
 
@@ -56,7 +59,7 @@ void client::send_to_participants(const std::string& s) {
 	}
 }
 
-void client::send_to_room(const std::string& s) {
+bool client::send_to_room(const std::string& s) {
 	if (_current_room.get() == nullptr);
 	else {
 		if (s == "@participants") (*_current_room)->get_participants(_name);
@@ -65,13 +68,15 @@ void client::send_to_room(const std::string& s) {
 	}
 }
 
-void client::send_to_server(const std::string& s) {
+bool client::send_to_server(const std::string& message) {
 	if (_current_server.get() == nullptr);
 	else {
-		if (s == "@rooms") (*_current_server)->list_of_rooms(_name);
-		else if (s.find("@createroom") == 0) (*_current_server)->create_room(s, _name);
-		else if (s.find("@enterroom") == 0) (*_current_server)->enter_room(s, _name);
-		else if (s == "@quit") (*_current_server)->leave_server(_name);
+		if (message == "@rooms") (*_current_server)->list_of_rooms(*this);
+		else if (message.find("@createroom") == 0) (*_current_server)->create_room(message, *this);
+		else if (message.find("@enterroom") == 0) (*_current_server)->enter_room(message, *this);
+		else if (message.find("@deleteroom") == 0) (*_current_server)->delete_room(message);
+		else if (message == "@quit") (*_current_server)->leave_server(*this);
+		else if (message == "@help") (*_current_server)->get_help(*this);
 	}
 }
 
@@ -85,4 +90,8 @@ void client::handler() {
 		}
 		else send_to_participants(message);
 	}
+}
+
+client::~client() {
+	
 }
