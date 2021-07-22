@@ -60,16 +60,18 @@ void client::send_to_participants(const std::string& s) {
 }
 
 bool client::send_to_room(const std::string& s) {
-	if (_current_room.get() == nullptr);
+	if (_current_room.get() == nullptr) return false;
 	else {
 		if (s == "@participants") (*_current_room)->get_participants(_name);
 		else if (s == "@history") (*_current_room)->get_history(_name);
 		else if (s == "@leaveroom") leave_room();
+		else return false;
+		return true;
 	}
 }
 
 bool client::send_to_server(const std::string& message) {
-	if (_current_server.get() == nullptr);
+	if (_current_server.get() == nullptr) return false;
 	else {
 		if (message == "@rooms") (*_current_server)->list_of_rooms(*this);
 		else if (message.find("@createroom") == 0) (*_current_server)->create_room(message, *this);
@@ -77,6 +79,8 @@ bool client::send_to_server(const std::string& message) {
 		else if (message.find("@deleteroom") == 0) (*_current_server)->delete_room(message);
 		else if (message == "@quit") (*_current_server)->leave_server(*this);
 		else if (message == "@help") (*_current_server)->get_help(*this);
+		else return false;
+		return true;
 	}
 }
 
@@ -85,8 +89,8 @@ void client::handler() {
 	while (_is_connected) {
 		message = receive();
 		if (message.find("@") == 0) {
-			send_to_room(message);
-			send_to_server(message);
+			if ((!send_to_server(message)) && (!send_to_room(message)))
+				(*_current_server)->send_to(_client_socket, "Server: Unknown command. Press @help to get more info.");
 		}
 		else send_to_participants(message);
 	}

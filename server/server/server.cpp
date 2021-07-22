@@ -55,12 +55,13 @@ void server::register_user(const SOCKET& sock) {
 	send_to(sock, "Introduce yourself.");
 	std::string name = receive(sock);
 
-	while (!is_name_unique(name)) {
-		send_to(sock, "Server: Name is not unique. Try again.\n");
+	while ((!is_name_unique(name)) || (name.find("@") == 0)) {
+		if (!is_name_unique(name)) send_to(sock, "Server: Name is not unique. Try again.");
+		else if (name.find("@") == 0) send_to(sock, "Server: Name cannot start with @. Try again.");
 		name = receive(sock);
 	}
 
-	send_to(sock, "Welcome, " + name + "!");
+	send_to(sock, "Server: Welcome, " + name + "!");
 	send_to(sock, "Server: Press @help to get more information.");
 	std::cout << "Server: Connected " + name + ".\n";
 	_clients.push_back(client(name, sock, *this));
@@ -96,7 +97,11 @@ void server::create_room(const std::string& command, const client& c) {
 	if ((pos != command.end()) && (pos + 1 != command.end())) {
 		for (auto it = pos + 1; it < command.end(); ++it) name_of_room.push_back(*it);
 		
-		if (_rooms.find(name_of_room) == _rooms.end()) {
+		if (name_of_room.find("@") == 0) {
+			send_to(c.get_socket(), "Server: Name cannot start with @. Try again.");
+			return;
+		}
+		else if (_rooms.find(name_of_room) == _rooms.end()) {
 			send_to(c.get_socket(), "Server: Room " + name_of_room + " has been created.");
 			room r(10);
 			_rooms[name_of_room] = r;
@@ -138,6 +143,7 @@ void server::leave_server(client& c) {
 	c.disconnect();
 
 	send_to(c.get_socket(), "@ack");
+	std::cout << "Server: Disconnected " + c.get_name() + ".\n";
 	
 	auto position = std::find_if(_clients.begin(), _clients.end(), [&c](client cur) {
 		return c.get_name() == cur.get_name();
@@ -146,15 +152,16 @@ void server::leave_server(client& c) {
 }
 
 void server::get_help(const client& c) {
-	std::string info = "\tHelp:\n";
+	std::string info = "\t\t\t\tHelp:\n";
 	info += "@rooms 				- get information about rooms on server\n";
 	info += "@createroom <name>		- create room\n";
 	info += "@enterroom <name>		- enter the room with the chosen name\n";
 	info += "@participants			- request a list of participants in room\n";
+	info += "@history			- request room message history\n";
 	info += "@leaveroom 			- leave the room where you at\n";
 	info += "@deleteroom <name>		- delete the room with the chosen name\n";
-	info += "@help					- get help\n";
-	info += "@quit					- end session";
+	info += "@help				- get help\n";
+	info += "@quit				- end session";
 
 	send_to(c.get_socket(), info);
 }
