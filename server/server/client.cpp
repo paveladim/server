@@ -2,13 +2,13 @@
 #include "room.h"
 #include "server.h"
 
-client::client(const std::string& name, const SOCKET& sock, server& s) : _name(name),
+Client::Client(const std::string& name, const SOCKET& sock, Server& s) : _name(name),
 	_client_socket(sock), _current_room(nullptr), _is_connected(true),
-	_current_server(std::make_shared<server*>(&s)), _proc_handler(&client::handler, *this) {
+	_current_server(std::make_shared<Server*>(&s)), _proc_handler(&Client::handler, *this) {
 	_proc_handler.detach();
 }
 
-client::client(const client& c) {
+Client::Client(const Client& c) {
 	_name = c._name;
 	_client_socket = c._client_socket;
 	_current_room = c._current_room;
@@ -16,7 +16,7 @@ client::client(const client& c) {
 	_is_connected = c._is_connected;
 }
 
-client& client::operator=(const client& c) {
+Client& Client::operator=(const Client& c) {
 	if (this == &c) return *this;
 	_name = c._name;
 	_client_socket = c._client_socket;
@@ -26,16 +26,16 @@ client& client::operator=(const client& c) {
 	return *this;
 }
 
-void client::disconnect() {
+void Client::disconnect() {
 	_current_server = nullptr;
 	_is_connected = false;
 }
 
-void client::set_room(room& r) {
-	_current_room = std::make_shared<room*>(&r);
+void Client::set_room(Room& r) {
+	_current_room = std::make_shared<Room*>(&r);
 }
 
-void client::leave_room() {
+void Client::leave_room() {
 	if (_current_room == nullptr);
 	else {
 		(*_current_room)->kick_user_out(_name);
@@ -43,7 +43,7 @@ void client::leave_room() {
 	}
 }
 
-std::string client::receive() {
+std::string Client::receive() const {
 	unsigned int msg_size = 0;
 	recv(_client_socket, (char*)&msg_size, sizeof(int), 0);
 	char* msg = new char[msg_size + 1];
@@ -52,14 +52,14 @@ std::string client::receive() {
 	return std::string(msg);
 }
 
-void client::send_to_participants(const std::string& s) {
+void Client::send_to_participants(const std::string& s) {
 	if (_current_room == nullptr);
 	else {
 		(*_current_room)->send_to_participants(s, _name);
 	}
 }
 
-bool client::send_to_room(const std::string& s) {
+bool Client::send_to_room(const std::string& s) {
 	if (_current_room.get() == nullptr) return false;
 	else {
 		if (s == "@participants") (*_current_room)->get_participants(_name);
@@ -70,7 +70,7 @@ bool client::send_to_room(const std::string& s) {
 	}
 }
 
-bool client::send_to_server(const std::string& message) {
+bool Client::send_to_server(const std::string& message) {
 	if (_current_server.get() == nullptr) return false;
 	else {
 		if (message == "@rooms") (*_current_server)->list_of_rooms(*this);
@@ -84,7 +84,7 @@ bool client::send_to_server(const std::string& message) {
 	}
 }
 
-void client::handler() {
+void Client::handler() {
 	std::string message;
 	while (_is_connected) {
 		message = receive();
@@ -96,6 +96,6 @@ void client::handler() {
 	}
 }
 
-client::~client() {
+Client::~Client() {
 	
 }

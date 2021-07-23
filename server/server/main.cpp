@@ -3,6 +3,6 @@
 #include "client.h"
 
 int main() {
-	server test;
+	Server serv;
 	return 0;
 }

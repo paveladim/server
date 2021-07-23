@@ -1,6 +1,6 @@
 #include "server.h"
 
-server::server() {
+Server::Server() {
 	WORD dll_version = MAKEWORD(2, 1);
 
 	if (WSAStartup(dll_version, &_wsa_data) == 0)
@@ -28,14 +28,14 @@ server::server() {
 	}
 }
 
-server::server(const server& s) {
+Server::Server(const Server& s) {
 	_wsa_data = s._wsa_data;
 	_server_socket = s._server_socket;
 	_rooms = s._rooms;
 	_clients = s._clients;
 }
 
-server& server::operator=(const server& s) {
+Server& Server::operator=(const Server& s) {
 	if (this == &s) return *this;
 	_wsa_data = s._wsa_data;
 	_server_socket = s._server_socket;
@@ -44,14 +44,14 @@ server& server::operator=(const server& s) {
 	return *this;
 }
 
-bool server::is_name_unique(std::string& clients_name) {
+bool Server::is_name_unique(std::string& clients_name) {
 	for (auto& elem : _clients)
 		if (clients_name == elem.get_name()) return false;
 	
 	return true;
 }
 
-void server::register_user(const SOCKET& sock) {
+void Server::register_user(const SOCKET& sock) {
 	send_to(sock, "Introduce yourself.");
 	std::string name = receive(sock);
 
@@ -64,10 +64,10 @@ void server::register_user(const SOCKET& sock) {
 	send_to(sock, "Server: Welcome, " + name + "!");
 	send_to(sock, "Server: Press @help to get more information.");
 	std::cout << "Server: Connected " + name + ".\n";
-	_clients.push_back(client(name, sock, *this));
+	_clients.push_back(Client(name, sock, *this));
 }
 
-std::string server::receive(const SOCKET& sock) {
+std::string Server::receive(const SOCKET& sock) {
 	unsigned int msg_size = 0;
 	recv(sock, (char*)&msg_size, sizeof(int), 0);
 	char* msg = new char[msg_size + 1];
@@ -76,7 +76,7 @@ std::string server::receive(const SOCKET& sock) {
 	return std::string(msg);
 }
 
-void server::list_of_rooms(const client& c) {
+void Server::list_of_rooms(const Client& c) {
 	std::string info;
 	if (_rooms.size() == 0) {
 		info = "Server: There's no room.";
@@ -91,7 +91,7 @@ void server::list_of_rooms(const client& c) {
 	send_to(client_socket, info);
 }
 
-void server::create_room(const std::string& command, const client& c) {
+void Server::create_room(const std::string& command, const Client& c) {
 	auto pos = find(command.begin(), command.end(), ' ');
 	std::string name_of_room;
 	if ((pos != command.end()) && (pos + 1 != command.end())) {
@@ -102,15 +102,27 @@ void server::create_room(const std::string& command, const client& c) {
 			return;
 		}
 		else if (_rooms.find(name_of_room) == _rooms.end()) {
-			send_to(c.get_socket(), "Server: Room " + name_of_room + " has been created.");
-			room r(10);
-			_rooms[name_of_room] = r;
+			send_to(c.get_socket(), "Server: Choose a way to store messages : On server or In file.");
+			std::string way_of_storing = c.receive();
+			if (way_of_storing == "On server") {
+				send_to(c.get_socket(), "Server: Room " + name_of_room + " has been created.");
+				Room r(true);
+				_rooms[name_of_room] = r;
+			}
+			else if (way_of_storing == "In file") {
+				Room r(false);
+				send_to(c.get_socket(), "Server: Room " + name_of_room + " has been created.");
+			}
+			else {
+				send_to(c.get_socket(), "Server: Unknown choice. Try again.");
+				return;
+			}
 		}
 		else send_to(c.get_socket(), "Server: Name is not unique. Try again.");
 	}
 }
 
-void server::enter_room(const std::string& command, client& c) {
+void Server::enter_room(const std::string& command, Client& c) {
 	auto pos = find(command.begin(), command.end(), ' ');
 	std::string name_of_room;
 	if ((pos != command.end()) && (pos + 1 != command.end())) {
@@ -125,7 +137,7 @@ void server::enter_room(const std::string& command, client& c) {
 	else send_to(c.get_socket(), "Server: Room does not exist.");
 }
 
-void server::delete_room(const std::string& command) {
+void Server::delete_room(const std::string& command) {
 	auto pos = find(command.begin(), command.end(), ' ');
 	std::string name_of_room;
 	if ((pos != command.end()) && (pos + 1 != command.end())) {
@@ -138,20 +150,20 @@ void server::delete_room(const std::string& command) {
 	_rooms.erase(name_of_room);
 }
 
-void server::leave_server(client& c) {
+void Server::leave_server(Client& c) {
 	c.leave_room();
 	c.disconnect();
 
 	send_to(c.get_socket(), "@ack");
 	std::cout << "Server: Disconnected " + c.get_name() + ".\n";
 	
-	auto position = std::find_if(_clients.begin(), _clients.end(), [&c](client cur) {
+	auto position = std::find_if(_clients.begin(), _clients.end(), [&c](Client cur) {
 		return c.get_name() == cur.get_name();
 	});
 	_clients.erase(position);
 }
 
-void server::get_help(const client& c) {
+void Server::get_help(const Client& c) {
 	std::string info = "\t\t\t\tHelp:\n";
 	info += "@rooms 				- get information about rooms on server\n";
 	info += "@createroom <name>		- create room\n";
@@ -166,15 +178,15 @@ void server::get_help(const client& c) {
 	send_to(c.get_socket(), info);
 }
 
-void server::send_to(const SOCKET& sock, const std::string& message) {
+void Server::send_to(const SOCKET& sock, const std::string& message) {
 	unsigned int msg_size = message.size();
 	send(sock, (char*)&msg_size, sizeof(int), NULL);
 	send(sock, message.c_str(), msg_size, NULL);
 }
 
-server::~server() {
+Server::~Server() {
 	for (auto& elem : _clients)
-		elem.leave_room();
+		leave_server(elem);
 
 	_clients.clear();
 	_rooms.clear();

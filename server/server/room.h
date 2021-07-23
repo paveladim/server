@@ -2,27 +2,30 @@
 #define ROOM_H
 
 #include "definitions.h"
-#include "history.h"
 
-class client;
+class History;
+class HOQ_factory;
+class HIF_factory;
 
-class room
+class Client;
+
+class Room
 {
-	std::list<std::shared_ptr<client*>> _participants;
-	history _history_of_room;
+	std::list<std::shared_ptr<Client*>> _participants;
+	std::shared_ptr<History*> _history_of_room;
 public:
-	room() {}
-	room(const unsigned int& qd);
-	room(const room& r);
-	room& operator=(const room& r);
-	void accept_client(client& new_client);
+	Room() {}
+	Room(const bool& choice);
+	Room(const Room& r);
+	Room& operator=(const Room& r);
+	void accept_client(Client& new_client);
 	void send_to_participants(const std::string& msg, const std::string& name);
 	void kick_user_out(const std::string& name);
 	void kick_all_users_out();
 	void get_participants(const std::string& name);
 	void get_history(const std::string& name);
 	void send_to(const SOCKET& sock, const std::string& message);
-	~room() {}
+	~Room() {}
 };
 
 #endif
