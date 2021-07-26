@@ -15,6 +15,7 @@ public:
 	History_on_queue& operator=(const History_on_queue& h);
 	virtual void add_message(const std::string& msg);
 	virtual std::string get_history();
+	virtual void start_history(const std::string& name_of_room);
 };
 
 #endif

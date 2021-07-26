@@ -40,3 +40,7 @@ std::string History_on_queue::get_history() {
 
 	return res;
 }
+
+void History_on_queue::start_history(const std::string& name_of_room) {
+
+}

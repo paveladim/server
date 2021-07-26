@@ -1,0 +1,7 @@
+LOG
+INFO: Started Mon Jul 26 13:26:32 2021
+INFO: Got new connection Mon Jul 26 13:26:45 2021
+INFO: Connected paveladim Mon Jul 26 13:26:48 2021
+INFO: Room t has been created Mon Jul 26 13:26:56 2021
+INFO: paveladim has joined to room Mon Jul 26 13:26:59 2021
+INFO: Disconnected paveladim Mon Jul 26 13:29:18 2021

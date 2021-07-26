@@ -13,11 +13,15 @@ class Room
 {
 	std::list<std::shared_ptr<Client*>> _participants;
 	std::shared_ptr<History*> _history_of_room;
+	time_t _tm;
+	std::string _name_of_room;
 public:
-	Room() {}
-	Room(const bool& choice);
+	Room() : _tm(time(NULL)) {}
+	Room(const bool& choice, const std::string& name);
 	Room(const Room& r);
 	Room& operator=(const Room& r);
+	std::string get_time();
+	std::shared_ptr<History*> get_room_hist() { return _history_of_room; };
 	void accept_client(Client& new_client);
 	void send_to_participants(const std::string& msg, const std::string& name);
 	void kick_user_out(const std::string& name);

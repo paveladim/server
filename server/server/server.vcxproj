@@ -142,6 +142,7 @@
     <ClCompile Include="client.cpp" />
     <ClCompile Include="history_in_file.cpp" />
     <ClCompile Include="history_on_queue.cpp" />
+    <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="room.cpp" />
     <ClCompile Include="server.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="history_in_file.h" />
     <ClInclude Include="history_on_queue.h" />
     <ClInclude Include="hoq_factory.h" />
+    <ClInclude Include="logger.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="server.h" />
   </ItemGroup>

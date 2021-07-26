@@ -3,16 +3,18 @@
 #include "hoq_factory.h"
 #include "hif_factory.h"
 
-Room::Room(const bool& choice) {
+Room::Room(const bool& choice, const std::string& name_of_room) : _name_of_room(name_of_room) {
 	if (choice) {
 		HOQ_factory factory;
 		History* h = factory.create_history();
 		_history_of_room = std::make_shared<History*>(h);
+		(*_history_of_room)->start_history(_name_of_room);
 	}
 	else {
 		HIF_factory factory;
 		History* h = factory.create_history();
 		_history_of_room = std::make_shared<History*>(h);
+		(*_history_of_room)->start_history(_name_of_room);
 	}
 }
 
@@ -28,6 +30,14 @@ Room& Room::operator=(const Room& r) {
 	return *this;
 }
 
+std::string Room::get_time() {
+	_tm = time(NULL);
+	char temp[256];
+	ctime_s(temp, 256, &_tm);
+	std::string result(temp);
+	return result;
+}
+
 void Room::accept_client(Client& c) {
 	c.set_room(*this);
 	auto ptr = std::make_shared<Client*>(&c);
@@ -35,7 +45,7 @@ void Room::accept_client(Client& c) {
 }
 
 void Room::send_to_participants(const std::string& msg, const std::string& name) {
-	std::string message = name + ": " + msg;
+	std::string message = get_time() + name + ": " + msg;
 	(*_history_of_room)->add_message(message);
 	
 	for (auto& elem : _participants)

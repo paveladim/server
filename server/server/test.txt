@@ -1,0 +1,16 @@
+Mon Jul 26 13:23:38 2021
+Server: paveladim has joined to room.
+Mon Jul 26 13:23:40 2021
+paveladim: hello
+Mon Jul 26 13:23:57 2021
+Server: alexanaxovna has joined to room.
+Mon Jul 26 13:24:07 2021
+alexanaxovna: Heloo
+Mon Jul 26 13:24:19 2021
+paveladim: Hi
+Mon Jul 26 13:24:22 2021
+paveladim: Whats wrong
+Mon Jul 26 13:24:29 2021
+Server: alexanaxovna has left the room.
+Mon Jul 26 13:24:31 2021
+Server: paveladim has left the room.
