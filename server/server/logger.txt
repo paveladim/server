@@ -1,7 +1,14 @@
 LOG
-INFO: Started Mon Jul 26 13:26:32 2021
-INFO: Got new connection Mon Jul 26 13:26:45 2021
-INFO: Connected paveladim Mon Jul 26 13:26:48 2021
-INFO: Room t has been created Mon Jul 26 13:26:56 2021
-INFO: paveladim has joined to room Mon Jul 26 13:26:59 2021
-INFO: Disconnected paveladim Mon Jul 26 13:29:18 2021
+INFO: Started Tue Jul 27 20:48:54 2021
+INFO: Got new connection Tue Jul 27 20:49:02 2021
+INFO: Connected paveladim Tue Jul 27 20:49:06 2021
+INFO: Got new connection Tue Jul 27 20:49:12 2021
+INFO: Connected alexanaxovna Tue Jul 27 20:49:22 2021
+INFO: Got new connection Tue Jul 27 20:49:24 2021
+INFO: Connected vodeneevm Tue Jul 27 20:49:35 2021
+INFO: Room orion has been created Tue Jul 27 20:50:18 2021
+INFO: paveladim has joined to room Tue Jul 27 20:50:29 2021
+INFO: vodeneevm has joined to room Tue Jul 27 20:50:48 2021
+INFO: Disconnected vodeneevm Tue Jul 27 20:51:17 2021
+INFO: Disconnected paveladim Tue Jul 27 20:51:20 2021
+INFO: Disconnected alexanaxovna Tue Jul 27 20:51:24 2021

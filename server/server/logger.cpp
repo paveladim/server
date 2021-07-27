@@ -1,5 +1,7 @@
 #include "logger.h"
 
+Logger* Logger::_logger = nullptr;
+
 Logger::Logger() {
 	_path = "logger.txt";
 	_fout.open(_path);
@@ -12,6 +14,11 @@ std::string Logger::get_time() {
 	ctime_s(temp, 256, &_tm);
 	std::string result(temp);
 	return result;
+}
+
+Logger* Logger::get_logger() {
+	if (_logger == nullptr) _logger = new Logger();
+	return _logger;
 }
 
 void Logger::info(const std::string& message) {

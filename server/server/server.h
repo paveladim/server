@@ -13,7 +13,7 @@ class Server
 	SOCKET _server_socket;
 	std::unordered_map<std::string, Room> _rooms;
 	std::list<Client> _clients;
-	Logger _logger;
+	Logger* _logger;
 public:
 	Server();
 	Server(const Server& s);

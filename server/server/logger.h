@@ -7,11 +7,15 @@
 
 class Logger
 {
+	static Logger* _logger;
 	std::string _path;
 	std::ofstream _fout;
 	time_t _tm;
-public:
 	Logger();
+public:
+	Logger(const Logger& l) = delete;
+	Logger& operator=(const Logger& l) = delete;
+	static Logger* get_logger();
 	std::string get_time();
 	void info(const std::string& message);
 	void debug(const std::string& message);

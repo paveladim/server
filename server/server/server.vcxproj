@@ -150,12 +150,10 @@
   <ItemGroup>
     <ClInclude Include="client.h" />
     <ClInclude Include="definitions.h" />
-    <ClInclude Include="hif_factory.h" />
     <ClInclude Include="history.h" />
     <ClInclude Include="history_factory.h" />
     <ClInclude Include="history_in_file.h" />
     <ClInclude Include="history_on_queue.h" />
-    <ClInclude Include="hoq_factory.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="server.h" />

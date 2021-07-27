@@ -1,21 +1,11 @@
 #include "room.h"
 #include "client.h"
-#include "hoq_factory.h"
-#include "hif_factory.h"
+#include "history_factory.h"
 
 Room::Room(const bool& choice, const std::string& name_of_room) : _name_of_room(name_of_room) {
-	if (choice) {
-		HOQ_factory factory;
-		History* h = factory.create_history();
-		_history_of_room = std::make_shared<History*>(h);
-		(*_history_of_room)->start_history(_name_of_room);
-	}
-	else {
-		HIF_factory factory;
-		History* h = factory.create_history();
-		_history_of_room = std::make_shared<History*>(h);
-		(*_history_of_room)->start_history(_name_of_room);
-	}
+	History_factory factory;
+	_history_of_room = std::make_shared<History*>(factory.create_history(choice));
+	(*_history_of_room)->start_history(_name_of_room);
 }
 
 Room::Room(const Room& r) {

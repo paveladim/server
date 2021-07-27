@@ -16,6 +16,7 @@ public:
 	virtual void add_message(const std::string& msg);
 	virtual std::string get_history();
 	virtual void start_history(const std::string& name_of_room);
+	~History_on_queue() {}
 };
 
 #endif

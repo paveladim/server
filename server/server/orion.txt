@@ -1,0 +1,14 @@
+Tue Jul 27 20:50:29 2021
+Server: paveladim has joined to room.
+Tue Jul 27 20:50:31 2021
+paveladim: hey
+Tue Jul 27 20:50:48 2021
+Server: vodeneevm has joined to room.
+Tue Jul 27 20:50:50 2021
+vodeneevm: hey
+Tue Jul 27 20:50:55 2021
+paveladim: hello
+Tue Jul 27 20:51:17 2021
+Server: vodeneevm has left the room.
+Tue Jul 27 20:51:20 2021
+Server: paveladim has left the room.

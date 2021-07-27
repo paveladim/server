@@ -4,9 +4,7 @@
 #include "definitions.h"
 
 class History;
-class HOQ_factory;
-class HIF_factory;
-
+class History_factory;
 class Client;
 
 class Room
@@ -22,7 +20,7 @@ public:
 	Room& operator=(const Room& r);
 	std::string get_time();
 	std::shared_ptr<History*> get_room_hist() { return _history_of_room; };
-	void accept_client(Client& new_client);
+	void accept_client(Client& c);
 	void send_to_participants(const std::string& msg, const std::string& name);
 	void kick_user_out(const std::string& name);
 	void kick_all_users_out();

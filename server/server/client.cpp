@@ -53,7 +53,9 @@ std::string Client::receive() const {
 }
 
 void Client::send_to_participants(const std::string& s) {
-	if (_current_room == nullptr);
+	if (_current_room == nullptr) {
+		(*_current_server)->send_to(_client_socket, "Server: You are not connected to any room");
+	}
 	else {
 		(*_current_room)->send_to_participants(s, _name);
 	}
